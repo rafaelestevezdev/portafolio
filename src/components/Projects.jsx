@@ -1,224 +1,154 @@
-import { useState, useEffect } from "react";
+import { FaCode, FaExternalLinkAlt, FaGithub } from "react-icons/fa";
+import Badge from "./Badge";
 
-export function Projects() {
-  const [projects, setProjects] = useState([]);
+// Datos separados del componente
+const projectsData = [
+  {
+    id: 1,
+    name: "Todo-App",
+    description:
+      "Aplicacion de lista de tareas minimalista con funcionalidad de agregar, eliminar y marcar tareas como completadas. Interfaz limpia y responsiva.",
+    image: "/images/projects/todo-app.png",
+    technologies: ["React", "Tailwind CSS"],
+    demoUrl: "https://todo-app-minimalist.vercel.app/",
+    githubUrl: "https://github.com/rafaelestevezdev/todo-app",
+    featured: true,
+  },
+  {
+    id: 2,
+    name: "Library-Book",
+    description:
+      "Aplicacion de gestion de libros para bibliotecas. Permite agregar, eliminar y editar libros, interfaz intuitiva y facil de usar.",
+    image: "/images/projects/library-app.png",
+    technologies: ["React", "Tailwind CSS"],
+    demoUrl: "https://library-book-minimalist.vercel.app/",
+    githubUrl: "https://github.com/rafaelestevezdev/library-book",
+    featured: true,
+  },
+];
 
-  useEffect(() => {
-    async function fetchFeaturedProjects() {
-      try {
-        // Lista de repositorios que quieres mostrar
-        const featuredRepos = [
-          {
-            name: "Admin-Dashboard",
-            image: "/images/projects/admin-dashboard.png",
-          },
-          {
-            name: "mi-portafolio",
-            image: "/images/projects/portfolio.png",
-          },
-          {
-            name: "todo-app",
-            image: "/images/projects/todo-app.png",
-          },
-          // Agrega más proyectos aquí
-        ];
+// Componente para el header de la sección
+const SectionHeader = () => (
+  <div className="flex items-center gap-4 mb-16">
+    <div className="flex items-center justify-center w-12 h-12">
+      <FaCode className="w-6 h-6 text-gray-600 dark:text-zinc-400" />
+    </div>
+    <h2 className="font-heading text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white tracking-tighter leading-tight">
+      Proyectos
+    </h2>
+  </div>
+);
 
-        console.log("Fetching projects:", featuredRepos);
-
-        const projectPromises = featuredRepos.map(async (repo) => {
-          console.log(`Fetching repo: ${repo.name}`);
-
-          // Obtener datos básicos del repo
-          const response = await fetch(
-            `https://api.github.com/repos/rafaelestevezdev/${repo.name}`
-          );
-          const project = await response.json();
-
-          console.log(`Response for ${repo.name}:`, project);
-
-          // Obtener TODOS los lenguajes del repo
-          const languagesResponse = await fetch(
-            `https://api.github.com/repos/rafaelestevezdev/${repo.name}/languages`
-          );
-          const languages = await languagesResponse.json();
-
-          console.log(`Languages for ${repo.name}:`, languages);
-
-          // Combinar datos del API con imagen personalizada y todos los lenguajes
-          return {
-            ...project,
-            customImage: repo.image,
-            allLanguages: Object.keys(languages), // Array con todos los lenguajes
-          };
-        });
-
-        const projects = await Promise.all(projectPromises);
-        const validProjects = projects.filter((project) => !project.message);
-
-        console.log("Final projects:", validProjects);
-        setProjects(validProjects);
-      } catch (error) {
-        console.error("Hubo un error al obtener los datos:", error);
-      }
-    }
-    fetchFeaturedProjects();
-  }, []);
-
+// Componente para la imagen del proyecto
+const ProjectImage = ({ image, name }) => {
+  if (!image) return null;
+  
   return (
-    <section id="projects" className="py-20 bg-black">
-      <div className="max-w-6xl mx-auto px-8 lg:px-12">
-        <div className="flex items-center gap-3 mb-12">
-          <svg
-            className="w-8 h-8 text-zinc-400"
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            strokeWidth="2"
-            stroke="currentColor"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-            <path d="M7 8l-4 4l4 4"></path>
-            <path d="M17 8l4 4l-4 4"></path>
-            <path d="M14 4l-4 16"></path>
-          </svg>
-          <h2 className="font-heading text-3xl sm:text-4xl font-bold text-white tracking-tighter leading-tight">
-            Proyectos
-          </h2>
-        </div>
+    <div className="w-full lg:w-1/2 flex-shrink-0">
+      <div className="aspect-video bg-gray-200 dark:bg-zinc-800 rounded-xl overflow-hidden relative">
+        <img
+          src={image}
+          alt={name}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+      </div>
+    </div>
+  );
+};
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects.map((project) => (
-            <div
-              key={project.id}
-              className="group bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden hover:border-zinc-600 transition-all duration-200 hover:scale-105"
-            >
-              {/* Vista previa/imagen del proyecto */}
-              <div className="aspect-video bg-zinc-800 relative overflow-hidden">
-                <img
-                  src={
-                    project.customImage ||
-                    `/images/projects/${project.name}.png`
-                  }
-                  alt={`Vista previa de ${project.name}`}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                  onError={(e) => {
-                    console.log(`Error cargando imagen: ${e.target.src}`);
-                    e.target.style.display = "none";
-                    e.target.nextSibling.style.display = "flex";
-                  }}
-                  onLoad={() => console.log("Imagen cargada exitosamente")}
-                />
+// Componente para las tecnologías
+const TechnologiesList = ({ technologies }) => (
+  <div>
+    <h4 className="text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-3 uppercase tracking-wider flex items-center gap-2">
+      <FaCode className="w-3 h-3" />
+      Tecnologías:
+    </h4>
+    <div className="flex flex-wrap gap-2">
+      {technologies.map((tech) => (
+        <Badge key={tech} variant="tech">
+          {tech}
+        </Badge>
+      ))}
+    </div>
+  </div>
+);
 
-                {/* Fallback si no hay imagen */}
-                <div
-                  className="w-full h-full flex items-center justify-center text-zinc-500 flex-col gap-2"
-                  style={{ display: "none" }}
-                >
-                  <svg
-                    className="w-16 h-16"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <span className="text-xs text-center">
-                    Sin imagen
-                    <br />
-                    disponible
-                  </span>
-                </div>
-              </div>
+// Componente para los enlaces
+const ProjectLinks = ({ demoUrl, githubUrl }) => (
+  <div className="hidden lg:flex items-center gap-6 pt-4">
+    {demoUrl && (
+      <a
+        href={demoUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-2 text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 text-sm font-medium transition-all duration-200 group/link"
+      >
+        <FaExternalLinkAlt className="w-3 h-3 group-hover/link:translate-x-0.5 transition-transform" />
+        Vista Previa
+      </a>
+    )}
+    
+    {githubUrl && (
+      <a
+        href={githubUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-2 text-gray-600 dark:text-zinc-400 hover:text-gray-800 dark:hover:text-zinc-300 text-sm font-medium transition-all duration-200 group/link"
+      >
+        <FaGithub className="w-3 h-3 group-hover/link:scale-110 transition-transform" />
+        Ver código
+      </a>
+    )}
+  </div>
+);
 
-              {/* Contenido */}
-              <div className="p-6">
-                <h3 className="font-heading text-xl font-semibold text-white mb-3 tracking-wide">
-                  {project.name}
-                </h3>
-                <p className="text-zinc-400 mb-4 line-clamp-3 leading-relaxed font-light">
-                  {project.description || "No hay descripción disponible"}
-                </p>
+// Componente para el contenido del proyecto
+const ProjectContent = ({ project }) => (
+  <div className="flex-1 space-y-6">
+    <div>
+      <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+        {project.name}
+      </h3>
+      <p className="text-gray-600 dark:text-zinc-400 text-base leading-relaxed">
+        {project.description}
+      </p>
+    </div>
+    
+    <TechnologiesList technologies={project.technologies} />
+    <ProjectLinks demoUrl={project.demoUrl} githubUrl={project.githubUrl} />
+  </div>
+);
 
-                <div className="flex items-center justify-between">
-                  {/* Mostrar todos los lenguajes */}
-                  <div className="flex flex-wrap gap-1">
-                    {project.allLanguages && project.allLanguages.length > 0 ? (
-                      project.allLanguages.slice(0, 3).map((lang) => (
-                        <span
-                          key={lang}
-                          className="text-xs text-zinc-300 bg-zinc-800 px-2 py-1 rounded-full border border-zinc-700"
-                        >
-                          {lang}
-                        </span>
-                      ))
-                    ) : (
-                      <span className="text-xs text-zinc-500 bg-zinc-800 px-2 py-1 rounded-full">
-                        {project.language || "N/A"}
-                      </span>
-                    )}
-                    {project.allLanguages &&
-                      project.allLanguages.length > 3 && (
-                        <span className="text-xs text-zinc-400 font-medium">
-                          +{project.allLanguages.length - 3}
-                        </span>
-                      )}
-                  </div>
+// Componente para un proyecto individual
+const ProjectCard = ({ project, index }) => {
+  const isEven = index % 2 === 0;
+  const flexDirection = isEven ? "lg:flex-row" : "lg:flex-row-reverse";
+  
+  return (
+    <div className={`flex flex-col ${flexDirection} gap-8 items-center`}>
+      <ProjectImage image={project.image} name={project.name} />
+      <ProjectContent project={project} />
+    </div>
+  );
+};
 
-                  {/* Enlaces */}
-                  <div className="flex items-center gap-2">
-                    {project.homepage && (
-                      <a
-                        href={project.homepage}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-sm text-zinc-300 hover:text-white transition-colors"
-                        title="Ver demo"
-                      >
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                          />
-                        </svg>
-                      </a>
-                    )}
-                    <a
-                      href={project.html_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-sm text-zinc-300 hover:text-white transition-colors"
-                      title="Ver código"
-                    >
-                      <svg
-                        className="w-4 h-4"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
+// Componente principal
+export function Projects() {
+  return (
+    <section
+      id="projects"
+      className="py-20 bg-white dark:bg-black transition-colors duration-300"
+    >
+      <div className="max-w-4xl mx-auto px-8 lg:px-12">
+        <SectionHeader />
+        
+        <div className="space-y-12">
+          {projectsData.map((project, index) => (
+            <ProjectCard 
+              key={project.id} 
+              project={project} 
+              index={index} 
+            />
           ))}
         </div>
       </div>

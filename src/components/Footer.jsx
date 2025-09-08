@@ -1,7 +1,7 @@
 export function Footer() {
   return (
-    <footer className="bg-black text-zinc-400 py-8">
-      <div className="max-w-6xl mx-auto px-8 lg:px-12">
+    <footer className="bg-white dark:bg-black text-gray-600 dark:text-zinc-400 py-8 border-t border-gray-200 dark:border-zinc-800 transition-colors duration-300">
+      <div className="max-w-4xl mx-auto px-8 lg:px-12">
         <div className="flex flex-col sm:flex-row justify-between items-center">
           <p className="text-sm">
             © {new Date().getFullYear()} Rafael Estévez. Todos los derechos
@@ -12,7 +12,7 @@ export function Footer() {
               href="https://github.com/rafaelestevezdev"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 hover:text-white transition-colors"
+              className="flex items-center gap-2 hover:text-gray-900 dark:hover:text-white transition-colors"
             >
               <svg
                 className="w-4 h-4"
@@ -35,7 +35,7 @@ export function Footer() {
               href="https://www.linkedin.com/in/rafaelestevezdev/"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 hover:text-white transition-colors"
+              className="flex items-center gap-2 hover:text-gray-900 dark:hover:text-white transition-colors"
             >
               <svg
                 className="w-4 h-4"
